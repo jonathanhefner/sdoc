@@ -13,3 +13,4 @@ end
 
 gem "importmap-rails"
 gem "railties"
+gem "puma"
