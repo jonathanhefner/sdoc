@@ -112,12 +112,6 @@
         }
     }
 
-    .panel_tree .result,
-    .panel_results .tree
-    {
-        display: none;
-    }
-
     .panel .logo {
       text-align: center;
     }
@@ -340,6 +334,13 @@
             background: #D798AB;
         }
 
+        #searchdoc .result {
+            display: none;
+        }
+
+        #searchdoc.searching .result {
+            display: initial;
+        }
     /* Results (end) */
 
     /* Tree (begin) */ /**/
@@ -483,6 +484,11 @@
         }
 
         .panel .tree .stopper
+        {
+            display: none;
+        }
+
+        #searchdoc.searching .tree
         {
             display: none;
         }
