@@ -1,3 +1,6 @@
+require "nokogiri"
+require "rouge"
+
 module SDoc::Helpers
   def each_letter_group(methods, &block)
     group = {:name => '', :methods => []}
@@ -43,6 +46,51 @@ module SDoc::Helpers
     end
 
     return "#{canonical_url}/#{context.as_href("")}"
+  end
+
+  def highlight_code_snippets(doc)
+    if doc.include?("</code></pre>")
+      fragment = Nokogiri::HTML.fragment(doc)
+
+      fragment.css("pre code").each do |node|
+        code = node.inner_text
+        language = guess_code_language(code)
+        node.inner_html = highlight_code(code, language)
+        node.append_class("highlight").append_class(language)
+      end
+
+      doc = fragment.to_s
+    end
+
+    doc
+  end
+
+  def highlight_code(code, language)
+    lexer = Rouge::Lexer.find_fancy(language)
+    Rouge::Formatters::HTML.format(lexer.lex(code))
+  end
+
+  def guess_code_language(code)
+    case code
+    when /--[+|]--/ # ASCII-art table
+      "plaintext"
+    when /(?:GET|POST|PUT|PATCH|DELETE|HEAD) +\// # routes listing or HTTP request
+      "plaintext"
+    when /\A(?:SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP) /
+      "sql"
+    when /^\$ /
+      "console"
+    when /^(?:- )?\w+:(?:\n| [#&|>])/
+      if code.include?("<%")
+        code.include?("<<:") ? "plaintext" : "erb"
+      else
+        "yaml"
+      end
+    when /^ *<[%a-z]/i
+      "erb" # also highlights HTML
+    else
+      "ruby"
+    end
   end
 
 protected
