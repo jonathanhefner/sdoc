@@ -1,7 +1,7 @@
 <div id="content">
   <% unless (description = context.description).empty? %>
     <div class="description">
-      <%= description %>
+      <%= highlight_code_snippets description %>
     </div>
   <% end %>
 
@@ -143,7 +143,7 @@
 
           <% if method.comment %>
             <div class="description">
-              <%= method.description.strip %>
+              <%= highlight_code_snippets method.description %>
             </div>
           <% end %>
 
