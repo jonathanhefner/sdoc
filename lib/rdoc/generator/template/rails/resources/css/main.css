@@ -410,9 +410,11 @@ tt {
   to { background-color: white; }
 }
 
-.spotlight {
-  animation-name: spotlight;
+/*.gogogo:focus {*/
+.gogogo:target {
+/*  animation-name: spotlight;
   animation-duration: 1s;
+*/  background: blue;
 }
 
 p code {
