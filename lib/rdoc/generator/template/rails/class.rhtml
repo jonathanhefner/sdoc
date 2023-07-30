@@ -10,7 +10,9 @@
     <% if description = page_description(klass.description) %>
     <meta name="description" property="og:description" content="<%= description %>">
     <% end %>
-    <meta name="keywords" content="<%= klass.full_name %> class, <%= klass.method_list.map(&:name).join(", ") %>">
+    <% if keywords = page_keywords(klass.method_list.map(&:name)) %>
+      <meta name="keywords" content="<%= keywords.join(", ") %>">
+    <% end %>
 </head>
 
 <body>
