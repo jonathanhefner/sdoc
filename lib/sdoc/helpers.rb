@@ -73,6 +73,15 @@ module SDoc::Helpers
     h text
   end
 
+  def page_keywords(raw_keywords)
+    keywords = raw_keywords.
+      map { |word| word.gsub(/\W/, " ").strip }.
+      reject { |word| word.empty? || word.match?(/\A(?:new|inspect|to_s)\z/) }.
+      uniq { |word| word.tr("_", "") }
+
+    keywords unless keywords.empty?
+  end
+
   def group_by_first_letter(rdoc_objects)
     rdoc_objects.sort_by(&:name).group_by do |object|
       object.name[/^[a-z]/i]&.upcase || "#"

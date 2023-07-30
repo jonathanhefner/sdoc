@@ -323,6 +323,28 @@ describe SDoc::Helpers do
     end
   end
 
+  describe "#page_keywords" do
+    it "removes non-word characters" do
+      _(@helpers.page_keywords(["foo!", "foo_bar?", "_qux=", "hoge_*_fuga"])).
+        must_equal ["foo", "foo_bar", "_qux", "hoge_ _fuga"]
+    end
+
+    it "filters insignificant keywords" do
+      _(@helpers.page_keywords(["foo", "[]=", "new", "inspect", "to_s"])).
+        must_equal ["foo"]
+    end
+
+    it "filters duplicate keywords" do
+      _(@helpers.page_keywords(["foo", "foo!", "bar", "_bar"])).
+        must_equal ["foo", "bar"]
+    end
+
+    it "returns nil when no keywords" do
+      _(@helpers.page_keywords([])).must_be_nil
+      _(@helpers.page_keywords(["[]", "[]="])).must_be_nil
+    end
+  end
+
   describe "#group_by_first_letter" do
     it "groups RDoc objects by the first letter of their #name" do
       context = rdoc_top_level_for(<<~RUBY).find_module_named("Foo")
