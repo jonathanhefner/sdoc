@@ -1,6 +1,9 @@
+* { box-sizing: border-box; }
+
 html {
   height: 100%;
 }
+
 body {
   font-family: "Helvetica Neue", Arial, sans-serif;
   background: #FFF;
@@ -9,45 +12,10 @@ body {
   font-size: 15px;
   line-height: 1.25em;
   min-height: 100%;
-  display: grid;
 
   --link-color: #CC0000;
   --link-hover-color: #990000;
   --icon-color: #777777;
-}
-
-body {
-  grid-template-rows: min-content min-content;
-  grid-template-columns: 100%;
-}
-
-@media (min-width: 600px) {
-  body {
-    grid-template-rows: min-content min-content;
-    grid-template-columns: 300px auto;
-  }
-
-  nav {
-    grid-row-start: 1;
-    grid-row-end: 2;
-    grid-column-start: 1;
-    grid-column-end: 1;
-  }
-
-  div.banner {
-    grid-row-start: 1;
-    grid-row-end: 1;
-    grid-column-start: 2;
-    grid-column-end: 2;
-  }
-
-  #bodyContent {
-    grid-row-start: 2;
-    grid-row-end: 2;
-    grid-column-start: 2;
-    grid-column-end: 2;
-    min-width: 0;
-  }
 }
 
 a:link, a:active, a:visited, a:hover {
@@ -60,18 +28,17 @@ a:hover {
   text-decoration: underline;
 }
 
-.banner a:hover {
-  color: white;
+h1 a, h2 a {
+  color: #fff;
 }
 
-h1 a, h2 a, .banner a {
-  color: #fff;
+.hidden {
+  display: none;
 }
 
 .external-link {
   padding-left: 1.3em;
-  background-image: url('../i/external-link.svg');
-  background-repeat: no-repeat;
+  background: url('../i/external-link.svg') no-repeat;
   background-size: 1.1em;
 }
 
@@ -158,36 +125,6 @@ ol li
     list-style: decimal;
 }
 
-.banner
-{
-    background: #B61D1D;
-    color: #FFF;
-    border-bottom: 1px solid #9b281c;
-    padding: 1em;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-}
-.banner h2
-{
-    font-size: 1.2em;
-    margin: 0;
-}
-
-.banner h2 .type
-{
-    font-size: 0.833em;
-    display:block;
-}
-
-.banner h2 .type,
-.banner h2 .parent
-{
-    color: #CCC;
-}
-
-.banner .github_url {
-  color: #CCC;
-}
-
 pre
 {
     margin-bottom: 1em;
@@ -220,14 +157,13 @@ pre
     display: inline;
 }
 
-#bodyContent {
-  margin: 1em;
+#content {
+  padding: 1em;
 }
 
 @media (min-width: 600px) {
-  #bodyContent {
-    max-width: 980px;
-    margin: 2em 3.5em;
+  #content {
+    padding: 2em 3.5em;
   }
 }
 
@@ -445,6 +381,150 @@ a.back-to-top {
 
 a.back-to-top.show {
   visibility: visible;
+}
+
+
+.content__full-name {
+  font-family: monospace;
+  font-size: 1.4rem;
+  line-height: 1.4;
+  margin-top: 0;
+  margin-left: 1em;
+  text-indent: -1em;
+}
+
+.content__full-name .qualifier {
+  font-weight: bold;
+}
+
+
+/*
+ * Navigation panel
+ */
+
+#panel {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  width: 100vw;
+
+  --banner-height: 3.5rem;
+}
+
+#panel__state {
+  display: none;
+}
+
+
+.banner {
+  height: var(--banner-height);
+  background-color: #B61D1D;
+}
+
+.banner__segment {
+  display: inline-block;
+  height: 100%;
+  padding: calc(0.15 * var(--banner-height));
+  filter: brightness(0) invert(1);
+}
+
+.banner__segment:first-child {
+  border-right: 1px solid;
+}
+
+.banner__menu-button {
+  display: inline-block;
+  height: 100%;
+  aspect-ratio : 1 / 1;
+  background: url('../i/menu.svg') no-repeat center;
+  background-size: 100%;
+}
+
+#panel:has(#panel__state:checked) .banner__menu-button {
+  background-image: url('../i/close.svg');
+}
+
+.banner__logo img {
+  height: 100%;
+}
+
+.banner__version {
+  font-size: 1.25rem;
+  font-style: italic;
+
+  position: relative;
+  bottom: 0.15em;
+}
+
+
+.panel__tray {
+  background: #FFF;
+
+  position: fixed;
+  top: var(--banner-height);
+  width: inherit;
+
+  overflow-y: hidden;
+  transition: max-height 0.2s ease-in-out;
+  max-height: 0;
+}
+
+#panel__state:checked ~ .panel__tray {
+  max-height: 100vh;
+}
+
+#search {
+  height: calc(0.70 * var(--banner-height));
+  width: 100%;
+
+  background: url('../i/search.svg') no-repeat;
+  background-position: 0.5em center;
+  padding-left: calc(0.5em + 16px + 0.5em);
+
+  border: 0;
+  box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.panel__tree {
+  height: calc(100vh - 1.70 * var(--banner-height));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Always contain scroll events in .panel__tree (on mobile) */
+.panel__tree .tree {
+  height: calc(100% + 1px);
+}
+
+.panel__tree .result:not(.hidden) ~ .tree {
+  display: none;
+}
+
+
+@media (min-width: 600px) {
+  #panel {
+    height: 0;
+    width: 300px;
+  }
+
+  #content {
+    margin-left: 300px;
+  }
+
+  .banner__segment:first-child {
+    display: none;
+  }
+
+  .panel__tray {
+    min-height: 100vh;
+    border-right: 1px solid #CCC;
+  }
+
+  .panel__tree .tree {
+    height: unset;
+  }
 }
 
 
