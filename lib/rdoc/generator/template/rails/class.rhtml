@@ -28,14 +28,10 @@
 
         <h2>
             <span class="type"><%= klass.module? ? 'Module' : 'Class' %></span>
-            <%= h klass.full_name %>
+            <%= full_name klass %>
             <% if klass.type == "class" && klass.superclass %>
-                <span class="parent">&lt;
-                    <% if klass.superclass.is_a?(String) %>
-                    <%= klass.superclass %>
-                    <% else %>
-                    <%= link_to klass.superclass.full_name, klass.superclass %>
-                    <% end %>
+                <span class="parent">
+                    &lt; <%= link_to_unless klass.superclass.is_a?(String), klass.superclass %>
                 </span>
             <% end %>
         </h2>
