@@ -67,10 +67,6 @@ a code {
   background-size: 1.1em;
 }
 
-.hidden {
-  display: none;
-}
-
 .kind {
   font-family: monospace;
   font-weight: bold;
