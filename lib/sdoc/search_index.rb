@@ -54,8 +54,15 @@ module SDoc::SearchIndex
     strings.concat(strings.map { |string| string.tr("_", "") })
     # Example: ":controller_name" => [" controller, " name"]
     strings.concat(strings.flat_map { |string| string.tr(":#_", " ").split(/(?= )/) })
-    # Example: "ActionController::Metal::controller_name" => ".c"
-    strings << name[/[:#]([^:])[^:#]*\z/, 1]&.prepend(".").to_s
+
+    if method_name_first_char = name[/[:#]([^:])[^:#]*\z/, 1]
+      # Example: "ActionController::Metal::controller_name" => ".c"
+      strings << ".#{method_name_first_char}"
+      # Example: "ActionController::Metal::controller_name" => "e("
+      strings << "#{name[-1]}("
+    else
+      strings << " :" # This bigram signifies a module.
+    end
 
     strings.flat_map { |string| string.each_char.each_cons(2).map(&:join) }.uniq
   end
@@ -67,17 +74,17 @@ module SDoc::SearchIndex
     bigram_sets.flatten.tally.sort_by(&:last).reverse.map(&:first).each_with_index.to_h
   end
 
-  BIGRAM_PATTERN_BONUSES = {
-    /[^a-z]/ => 1, # Bonus point for non-lowercase-alpha chars because they show intentionality.
-    /^ / => 1, # Another bonus point for matching start of token because it shows intentionality.
-    /^:/ => 3, # More points for start of module because more it shows intentionality than just space.
-    / :/ => 5, # When query includes " :" (or starts with ":"), prefer modules.
-    /[#.]/ => 50, # When query includes "#" or ".", strongly prefer methods.
+  BIGRAM_PATTERN_WEIGHTS = {
+    /[^a-z]/ => 2, # Bonus point for non-lowercase-alpha chars because they show intentionality.
+    /^ / => 3, # More bonus points for matching start of token because it shows more intentionality.
+    /^:/ => 4, # Slightly more points for start of module because it shows even more intentionality.
+    / :/ => 3, # When query includes " :" (or starts with ":"), slightly prefer modules.
+    /[#.(]/ => 50, # When query includes "#", ".", or "(", strongly prefer methods.
   }
 
   def compute_bit_weights(bigram_bit_positions)
     bigram_bit_positions.uniq(&:last).sort_by(&:last).map do |bigram, _position|
-      1 + BIGRAM_PATTERN_BONUSES.sum { |pattern, bonus| bigram.match?(pattern) ? bonus : 0 }
+      BIGRAM_PATTERN_WEIGHTS.map { |pattern, weight| bigram.match?(pattern) ? weight : 1 }.max
     end
   end
 
