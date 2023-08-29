@@ -18,7 +18,7 @@ module SDoc::SearchIndex
     rdoc_objects.zip(bigram_sets) do |rdoc_object, bigrams|
       entries << [
         generate_fingerprint(bigrams, bigram_bit_positions), # Fingerprint
-        1.0 / bigrams.length, # Tie-breaker bonus
+        1.0 / rdoc_object.full_name.length, # Tie-breaker bonus
         rdoc_object.path, # URL
       ]
 
@@ -28,9 +28,14 @@ module SDoc::SearchIndex
       else
         entries.last << name_for(rdoc_object.parent) # Class name
         entries.last << name_for(rdoc_object) # Method name
+
+        # Give slightly more weight to the method name so that short method
+        # name + long module name ranks higher than long method name + short
+        # module name.
+        entries.last[1] = entries.last[1] * 0.97 + (1.0 / rdoc_object.name.length) * 0.03
       end
 
-      if description = truncate_description(rdoc_object.description, 150)
+      if description = truncate_description(rdoc_object.description, 140)
         entries.last << description # Summary
       end
     end
@@ -63,10 +68,11 @@ module SDoc::SearchIndex
   end
 
   BIGRAM_PATTERN_BONUSES = {
-    /[^a-z]/ => 1, # TODO comment
-    /^ / => 1,  # TODO comment
-    /^:/ => 3,  # TODO comment
-    /[#.]/ => 50, # TODO comment
+    /[^a-z]/ => 1, # Bonus point for non-lowercase-alpha chars because they show intentionality.
+    /^ / => 1, # Another bonus point for matching start of token because it shows intentionality.
+    /^:/ => 3, # More points for start of module because more it shows intentionality than just space.
+    / :/ => 5, # When query includes " :" (or starts with ":"), prefer modules.
+    /[#.]/ => 50, # When query includes "#" or ".", strongly prefer methods.
   }
 
   def compute_bit_weights(bigram_bit_positions)

@@ -330,6 +330,55 @@ html {
 
 
 /*
+ * Search results
+ */
+#results { margin-left: 320px; width: 60ch; }
+
+#results {
+  font-size: 0.95em;
+}
+
+.results__result {
+  margin-top: var(--space-lg);
+  border-left: 5px solid transparent;
+  border-radius: 5px;
+  padding-left: 10px;
+}
+
+.results__result.cursor {
+  border-color: var(--link-color);
+}
+
+.results__result:has(.result__link:hover) {
+  border-color: var(--link-hover-color);
+}
+
+.result__link {
+  display: flex;
+  flex-direction: column;
+}
+
+.result__method::before {
+  content: "\221F";
+  color: var(--text-color);
+
+  font-size: 1.25em;
+  line-height: 0;
+  position: relative;
+  bottom: .1em;
+  padding: 0 0.2em;
+}
+
+.result__summary {
+  margin: var(--space-sm) 0 0 0;
+}
+
+:is(.result__method, .result__summary):empty {
+  display: none;
+}
+
+
+/*
  * Main content
  */
 
@@ -551,8 +600,7 @@ html {
   font-style: italic;
 }
 
-.description pre,
-.description p code {
+.description :is(code, pre) {
   background: var(--code-bg);
 }
 
