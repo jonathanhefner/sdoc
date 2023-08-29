@@ -93,7 +93,11 @@ class RDoc::Generator::SDoc
 
     # Now actually write the output
     copy_resources
-    generate_search_index
+    # generate_search_index
+      # FileUtils.mkdir_p("/home/hef/src/sdoc/doc/public/js")
+      # @outputdir = Pathname("/home/hef/src/sdoc/doc/public")
+      # return generate_search_index
+      `cp /home/hef/src/sdoc/.notes/search-index/search-index--post-rework.js #{@outputdir}/js/search-index.js`
     generate_file_links
     generate_class_tree
 
