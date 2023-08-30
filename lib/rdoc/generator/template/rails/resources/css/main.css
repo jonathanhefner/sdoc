@@ -196,8 +196,10 @@ a.back-to-top.show {
 
 html {
   --banner-height: 3.5rem;
+  --search-height: calc(0.70 * var(--banner-height));
   scroll-padding-top: calc(var(--banner-height) + 1rem);
 }
+
 
 #panel {
   position: sticky;
@@ -254,10 +256,9 @@ html {
 
 
 .panel__tray {
-  background: var(--body-bg);
-
-  position: fixed;
-  top: var(--banner-height);
+  /*position: fixed;*/
+  /*top: var(--banner-height);*/
+  position: absolute;
   width: inherit;
 
   overflow-y: hidden;
@@ -270,7 +271,7 @@ html {
 }
 
 #search {
-  height: calc(0.70 * var(--banner-height));
+  height: var(--search-height);
   width: 100%;
 
   background: url('../i/search.svg') no-repeat;
@@ -283,20 +284,41 @@ html {
   box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.panel__tree {
-  height: calc(100dvh - 1.70 * var(--banner-height));
-  overflow-x: hidden;
+.results__container, .tree__container {
+  background: var(--body-bg);
+  position: absolute;
+  max-height: calc(100dvh - var(--banner-height) - var(--search-height));
+  width: 100%;
+  /*width: inherit;*/
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-/* Always contain scroll events in .panel__tree (on mobile) */
-.panel__tree .tree {
-  height: calc(100% + 1px);
+/* Always contain scroll events (on mobile) */
+/*:is(.results__container, .tree__container) > :first-child {*/
+  /*height: calc(100% + 1px);*/
+  /*min-height: calc(100% + 1px);*/
+:is(.results__container, .tree__container)::after {
+  content: "";
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  bottom: -1px;
 }
 
-.panel__tree .result:not(.hidden) ~ .tree {
-  display: none;
+
+
+
+
+
+
+.results__container {
+  z-index: 1;
+}
+
+
+.tree__container {
+  overflow-x: hidden;
 }
 
 
@@ -323,8 +345,9 @@ html {
     border-right: 1px solid color-mix(in srgb, currentColor 25%, transparent);
   }
 
-  .panel__tree .tree {
-    height: unset;
+  :is(.results__container, .tree__container) > :first-child {
+    /*height: unset;*/
+    min-height: unset;
   }
 }
 
@@ -365,7 +388,7 @@ html {
   font-size: 1.25em;
   line-height: 0;
   position: relative;
-  bottom: .1em;
+  bottom: 0.1em;
   padding: 0 0.2em;
 }
 
