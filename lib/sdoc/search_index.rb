@@ -18,7 +18,7 @@ module SDoc::SearchIndex
     rdoc_objects.zip(bigram_sets) do |rdoc_object, bigrams|
       entries << [
         generate_fingerprint(bigrams, bigram_bit_positions), # Fingerprint
-        0.1 / Math.sqrt(rdoc_object.full_name.length), # Tie-breaker bonus
+        0.1 / Math.sqrt(rdoc_object.full_name.length), # Tie-breaker bonus per matching bigram
         rdoc_object.path, # URL
       ]
 
@@ -29,7 +29,7 @@ module SDoc::SearchIndex
         entries.last << name_for(rdoc_object.parent) # Class name
         entries.last << name_for(rdoc_object) # Method name
 
-        # Reduce tie-breaker points in proportion to method name length. This
+        # Reduce tie-breaker bonus in proportion to method name length. This
         # prioritizes modules before methods, and short method + long module
         # before long method + short module. For example, when searching for
         # "find_by", this prioritizes ActiveRecord::FinderMethods#find_by before
@@ -76,9 +76,9 @@ module SDoc::SearchIndex
 
   BIGRAM_PATTERN_WEIGHTS = {
     /[^a-z]/ => 2, # Bonus point for non-lowercase-alpha chars because they show intentionality.
-    /^ / => 3, # More bonus points for matching start of token because it shows more intentionality.
+    /^ / => 3, # More points for matching start of token because it shows more intentionality.
     /^:/ => 4, # Slightly more points for start of module because it shows even more intentionality.
-    /[#.(]/ => 50, # When query includes "#", ".", or "(", strongly prefer methods.
+    /[#.(]/ => 50, # Strongly prefer methods when query includes "#", ".", or "(".
   }
 
   def compute_bit_weights(bigram_bit_positions)
