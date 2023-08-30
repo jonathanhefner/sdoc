@@ -18,7 +18,7 @@ module SDoc::SearchIndex
     rdoc_objects.zip(bigram_sets) do |rdoc_object, bigrams|
       entries << [
         generate_fingerprint(bigrams, bigram_bit_positions), # Fingerprint
-        1.0 / rdoc_object.full_name.length, # Tie-breaker bonus
+        0.1 / Math.sqrt(rdoc_object.full_name.length), # Tie-breaker bonus
         rdoc_object.path, # URL
       ]
 
@@ -29,10 +29,12 @@ module SDoc::SearchIndex
         entries.last << name_for(rdoc_object.parent) # Class name
         entries.last << name_for(rdoc_object) # Method name
 
-        # Give slightly more weight to the method name so that short method
-        # name + long module name ranks higher than long method name + short
-        # module name.
-        entries.last[1] = entries.last[1] * 0.97 + (1.0 / rdoc_object.name.length) * 0.03
+        # Reduce tie-breaker points in proportion to method name length. This
+        # prioritizes modules before methods, and short method + long module
+        # before long method + short module. For example, when searching for
+        # "find_by", this prioritizes ActiveRecord::FinderMethods#find_by before
+        # ActiveRecord::Querying#find_by_sql.
+        entries.last[1] *= 0.95 ** rdoc_object.name.length
       end
 
       if description = truncate_description(rdoc_object.description, 140)
@@ -55,13 +57,11 @@ module SDoc::SearchIndex
     # Example: ":controller_name" => [" controller, " name"]
     strings.concat(strings.flat_map { |string| string.tr(":#_", " ").split(/(?= )/) })
 
-    if method_name_first_char = name[/[:#]([^:])[^:#]*\z/, 1]
+    if method_name_first_char = name[/(?:#|::)([^A-Z])/, 1]
       # Example: "ActionController::Metal::controller_name" => ".c"
       strings << ".#{method_name_first_char}"
       # Example: "ActionController::Metal::controller_name" => "e("
       strings << "#{name[-1]}("
-    else
-      strings << " :" # This bigram signifies a module.
     end
 
     strings.flat_map { |string| string.each_char.each_cons(2).map(&:join) }.uniq
@@ -78,7 +78,6 @@ module SDoc::SearchIndex
     /[^a-z]/ => 2, # Bonus point for non-lowercase-alpha chars because they show intentionality.
     /^ / => 3, # More bonus points for matching start of token because it shows more intentionality.
     /^:/ => 4, # Slightly more points for start of module because it shows even more intentionality.
-    / :/ => 3, # When query includes " :" (or starts with ":"), slightly prefer modules.
     /[#.(]/ => 50, # When query includes "#", ".", or "(", strongly prefer methods.
   }
 
