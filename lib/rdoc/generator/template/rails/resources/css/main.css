@@ -258,23 +258,14 @@ html {
 
 .panel__tray {
   background: var(--body-bg);
-
-  /*position: fixed;*/
-  /*top: var(--banner-height);*/
   position: absolute;
-  /*width: inherit;*/
-  /*min-width: 100%;*/
 
   overflow-y: hidden;
-  /*transition: max-height 0.2s ease-in-out;*/
-  /*max-height: 0;*/
   transition: height 0.2s ease-in-out;
   height: 0;
 }
 
 #panel__state:checked ~ .panel__tray {
-  /*max-height: 100dvh;*/
-  /*height: calc(100dvh - var(--banner-height));*/
   height: 100dvh;
 }
 
@@ -293,12 +284,11 @@ html {
 }
 
 .panel__results, .panel__tree {
-  /*position: absolute;*/
   position: relative;
   height: calc(100dvh - var(--banner-height) - var(--search-height));
-  /*width: 100%;*/
-  /*width: inherit;*/
   width: var(--panel-width);
+  transition: opacity 0.15s ease-in-out;
+
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -316,11 +306,15 @@ html {
 .panel__results:not(.active),
 .panel__search:placeholder-shown ~ .panel__results,
 .panel__search:not(:placeholder-shown) ~ .panel__results.active ~ .panel__tree {
-  display: none;
+  /* `display: none` disables animations, so simulate it instead */
+  max-height: 0;
+  max-width: 0;
+  padding: 0;
+
+  opacity: 0;
 }
 
 .panel__tree {
-  /*width: 100%;*/
   overflow-x: hidden;
 }
 
@@ -330,10 +324,6 @@ html {
     --panel-width: 300px;
     scroll-padding-top: 1rem;
   }
-
-  /*.panel__tree { width: 300px; }*/
-  /*.panel__results { width: 60ch; }*/
-  .panel__results.active { width: 60ch; transition: width 1s ease-in-out; animation-delay: 100ms; }
 
   #content {
     margin-top: calc(-1 * var(--banner-height));
@@ -349,6 +339,10 @@ html {
     border-right: 1px solid color-mix(in srgb, currentColor 25%, transparent);
   }
 
+  .panel__results.active {
+    width: 60ch;
+  }
+
   :is(.panel__results, .panel__tree)::after {
     display: none;
   }
@@ -358,7 +352,6 @@ html {
 /*
  * Navigation panel - Search
  */
-/*#results { margin-left: 320px; width: 60ch; }*/
 
 .panel__results {
   font-size: 0.95em;

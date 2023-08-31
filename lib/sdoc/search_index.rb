@@ -37,7 +37,7 @@ module SDoc::SearchIndex
         entries.last[1] *= 0.95 ** rdoc_object.name.length
       end
 
-      if description = truncate_description(rdoc_object.description, 140)
+      if description = truncate_description(rdoc_object.description, 130)
         entries.last << description # Summary
       end
     end
