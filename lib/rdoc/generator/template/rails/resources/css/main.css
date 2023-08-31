@@ -52,7 +52,7 @@ a {
   }
 }
 
-a:has(> code:only-child) {
+a:has(> code):not(:has(> :not(code))) {
   text-decoration: none;
 }
 
@@ -361,7 +361,7 @@ html {
 
 .panel__results:empty::before {
   content: "No results.";
-  font-style: italic; /*TODO tweak*/
+  font-style: italic;
 }
 
 .results__result:not(:first-child) {
@@ -392,15 +392,15 @@ html {
   flex-direction: column;
 }
 
+.result__method {
+  display: flex;
+}
+
 .result__method::before {
   content: "\221F";
-  color: var(--text-color);
-
   font-size: 1.25em;
-  line-height: 0;
-  position: relative;
-  bottom: 0.1em;
-  padding: 0 0.2em;
+  margin: -0.3em 0.2em;
+  color: var(--text-color);
 }
 
 .result__summary {
