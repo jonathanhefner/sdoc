@@ -9,6 +9,21 @@ RDoc::TopLevel.prepend(Module.new do
 end)
 
 
+RDoc::Markup::Formatter.prepend(Module.new do
+  def _word_break_code(code)
+    code.gsub(%r".::|\w/+(?=\w)|\S\((?!\))", '\0<wbr>')
+  end
+
+  def convert_flow(flow)
+    if in_tt?
+      flow = flow.map { |item| item.is_a?(String) ? _word_break_code(item) : item }
+    end
+
+    super
+  end
+end)
+
+
 RDoc::Markup::ToHtmlCrossref.prepend(Module.new do
   def cross_reference(name, text = nil, code = true)
     if text
@@ -19,6 +34,6 @@ RDoc::Markup::ToHtmlCrossref.prepend(Module.new do
       return name
     end
 
-    super
+    super.sub(%r"(?<=<code>).+(?=</code>)") { |code| _word_break_code(code) }
   end
 end)
