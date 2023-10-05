@@ -1,6 +1,11 @@
 require "nokogiri"
 require "pathname"
-require "rouge"
+$VERBOSE.tap do
+  $VERBOSE = nil
+   require "rouge"
+ensure
+  $VERBOSE = _1
+end
 require "uri"
 
 module SDoc::Postprocessor

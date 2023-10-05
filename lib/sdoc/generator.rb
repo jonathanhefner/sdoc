@@ -85,9 +85,15 @@ class RDoc::Generator::SDoc
     @files = @store.all_files.sort
     @classes = @store.all_classes_and_modules.sort
 
+# require "debug"
+# debugger
+# exit
+
     FileUtils.mkdir_p(@output_dir)
     copy_resources
-    generate_search_index
+    # generate_search_index
+    #   exit
+      `cp #{__dir__}/../../.notes/search-index/search-index--post-constants.js #{@output_dir}/js/search-index.js` unless @options.dry_run
     generate_index_file
     generate_file_files
     generate_class_files
