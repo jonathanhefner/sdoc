@@ -213,7 +213,7 @@ module SDoc::Helpers
         "<b>#{h $1}</b>#{h $2}#{" <span class=\"returns\">&rarr;</span> #{h $3}" if $3}"
       end
     else
-      "<b>#{h rdoc_method.name}</b>#{h rdoc_method.params}"
+      "<b>#{h rdoc_method.name}</b>(#{h rdoc_method.params.gsub(/\A\(\s*|\s*\)\z/, "")})"
     end
 
     "<code>#{signature}</code>"

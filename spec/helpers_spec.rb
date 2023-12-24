@@ -797,6 +797,21 @@ describe SDoc::Helpers do
       _(@helpers.method_signature(method)).must_equal "<code><b>bar</b>(op = :&lt;, &amp;block)</code>"
     end
 
+    it "removes extra whitespace from the parameter list" do
+      method = rdoc_top_level_for(<<~RUBY).find_module_named("Foo").find_method("bar", false)
+        module Foo
+          def bar(
+            x,
+            y,
+            z
+          )
+          end
+        end
+      RUBY
+
+      _(@helpers.method_signature(method)).must_equal "<code><b>bar</b>(x, y, z)</code>"
+    end
+
     it "handles :call-seq: documentation" do
       mod = rdoc_top_level_for(<<~RUBY).find_module_named("Foo")
         module Foo
