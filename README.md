@@ -1,3 +1,5 @@
+Test Tests
+
 # SDoc
 
 [![Tests](https://github.com/rails/sdoc/actions/workflows/test.yml/badge.svg)](https://github.com/rails/sdoc/actions/workflows/test.yml)
